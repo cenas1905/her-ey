@@ -1050,11 +1050,22 @@ function autoConvertCase() { if(document.getElementById('cc-output').value) conv
 
 // ===== BASE64 =====
 function base64Encode() {
-  try{ document.getElementById('b64-result').textContent=btoa(unescape(encodeURIComponent(document.getElementById('b64-input').value))); }
+  try{ 
+    const str = document.getElementById('b64-input').value;
+    const bytes = new TextEncoder().encode(str);
+    const binString = Array.from(bytes, byte => String.fromCharCode(byte)).join('');
+    document.getElementById('b64-result').textContent = btoa(binString);
+  }
   catch(e){ document.getElementById('b64-result').textContent='Hata: '+e.message; }
 }
 function base64Decode() {
-  try{ document.getElementById('b64-result').textContent=decodeURIComponent(escape(atob(document.getElementById('b64-input').value.trim()))); }
+  try{ 
+    const b64 = document.getElementById('b64-input').value.trim();
+    const binString = atob(b64);
+    const bytes = new Uint8Array(binString.length);
+    for (let i = 0; i < binString.length; i++) { bytes[i] = binString.charCodeAt(i); }
+    document.getElementById('b64-result').textContent = new TextDecoder().decode(bytes);
+  }
   catch(e){ document.getElementById('b64-result').textContent='Hata: Geçersiz Base64 veya çözülemedi.'; }
 }
 
@@ -1285,10 +1296,10 @@ function reverseText(type){
   const input=document.getElementById('tr-input').value;
   let out='';
   switch(type){
-    case 'full': out=input.split('').reverse().join(''); break;
+    case 'full': out=[...input].reverse().join(''); break;
     case 'words': out=input.split(/\s+/).reverse().join(' '); break;
-    case 'word-letters': out=input.split(/\s+/).map(w=>w.split('').reverse().join('')).join(' '); break;
-    case 'shuffle': const arr=input.split('');for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}out=arr.join('');break;
+    case 'word-letters': out=input.split(/\s+/).map(w=>[...w].reverse().join('')).join(' '); break;
+    case 'shuffle': const arr=[...input];for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}out=arr.join('');break;
   }
   document.getElementById('tr-output').value=out;
 }
@@ -1618,17 +1629,25 @@ function testRegex(){
     const re = new RegExp(pattern, flags);
     const matches = input.match(re);
     if(matches){
-      let html = input;
+      const escapeHtml = (str) => str ? str.replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+      let html = '';
       if(flags.includes('g')){
-        const parts = input.split(re);
-        let out = '';
-        for(let i=0;i<parts.length;i++){
-          out += parts[i].replace(/</g,'&lt;').replace(/>/g,'&gt;');
-          if(matches[i]) out += '<span class="regex-highlight">'+matches[i]+'</span>';
+        let lastIndex = 0;
+        for (const match of input.matchAll(re)) {
+          html += escapeHtml(input.slice(lastIndex, match.index));
+          html += '<span class="regex-highlight">' + escapeHtml(match[0]) + '</span>';
+          lastIndex = match.index + match[0].length;
+          if (match[0].length === 0) lastIndex++; // Prevent infinite loops on empty matches if any
         }
-        html = out;
+        html += escapeHtml(input.slice(lastIndex));
       } else {
-        html = input.replace(re, m => '<span class="regex-highlight">'+m+'</span>');
+        const matchObj = re.exec(input);
+        if(matchObj){
+          const before = input.slice(0, matchObj.index);
+          const matchStr = matchObj[0];
+          const after = input.slice(matchObj.index + matchStr.length);
+          html = escapeHtml(before) + '<span class="regex-highlight">' + escapeHtml(matchStr) + '</span>' + escapeHtml(after);
+        }
       }
       result.innerHTML = html || 'Eşleşme yok';
       count.textContent = flags.includes('g') ? matches.length + ' eşleşme bulundu' : '1 eşleşme bulundu';
