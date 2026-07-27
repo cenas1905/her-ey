@@ -7,7 +7,7 @@
 <meta property="og:title" content="Araç Kutusu — Ücretsiz Online Araçlar">
 <meta property="og:description" content="Ücretsiz online araç kutusu. Kelime sayacı, şifre üretici, QR kod oluşturucu ve daha fazlası tek bir yerde.">
 <meta property="og:type" content="website">
-<title>Araç Kutusu — Ücretsiz Online Araçlar</title>
+<title>Araç Kutusu — Ücretsiz Online Araçlar</title>\n<link rel="manifest" href="manifest.json">\n<meta name="theme-color" content="#6c5ce7">\n<link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Toolbox_icon.svg/512px-Toolbox_icon.svg.png">\n
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js" defer></script>
@@ -1900,5 +1900,5 @@ function copyPickerColors(){
   showToast('✅ '+hex+' kopyalandı!');
 }
 </script>
-</body>
+<script>\nif ('serviceWorker' in navigator) {\n  window.addEventListener('load', () => {\n    navigator.serviceWorker.register('./sw.js').then(reg => {\n      console.log('SW registered!');\n    });\n  });\n}\n</script>\n</body>
 </html>
