@@ -1,0 +1,17 @@
+{
+  "name": "Araç Kutusu",
+  "short_name": "AraçKutusu",
+  "description": "Ücretsiz online araçlar. Kelime sayacı, şifre üretici, renk paleti ve fazlası.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0f1117",
+  "theme_color": "#6c5ce7",
+  "icons": [
+    {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Toolbox_icon.svg/512px-Toolbox_icon.svg.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
