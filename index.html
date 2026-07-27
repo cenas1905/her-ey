@@ -7,6 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
 <style>
 /* ===== RESET & BASE ===== */
 *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
@@ -230,6 +231,61 @@ select { cursor:pointer; appearance:none; background-image:url("data:image/svg+x
 .resize-info { display:flex; gap:20px; flex-wrap:wrap; margin-top:8px; font-size:12px; color:var(--text2); }
 .resize-info span { color:var(--text); font-weight:500; }
 
+/* Arama çubuğu */
+.search-wrap { position:relative; margin-bottom:10px; }
+.search-wrap input {
+  width:100%; padding:8px 12px 8px 34px; background:var(--bg3); border:1px solid var(--bg4);
+  border-radius:var(--radius2); color:var(--text); font-size:13px; transition:border var(--transition);
+}
+.search-wrap input:focus { outline:none; border-color:var(--accent); }
+.search-wrap svg { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text3); width:14px; height:14px; }
+.nav-item.hidden { display:none; }
+.tool-card.hidden { display:none; }
+
+/* Tema toggle */
+.theme-toggle {
+  display:flex; align-items:center; gap:8px; cursor:pointer;
+  padding:5px 10px; border-radius:var(--radius2); border:1px solid var(--bg4);
+  background:var(--bg3); color:var(--text2); font-size:12px; transition:all var(--transition);
+}
+.theme-toggle:hover { border-color:var(--text3); color:var(--text); }
+
+/* Açık tema */
+body.light { --bg:#f5f6fa; --bg2:#ffffff; --bg3:#f0f1f5; --bg4:#e0e2e8;
+  --text:#1a1d26; --text2:#555a6b; --text3:#9499ab; --accent:#5b4ae0; --accent2:#4a38c0; --accent3:#e8e5ff; }
+
+/* Footer */
+.site-footer {
+  border-top:1px solid var(--bg4); background:var(--bg2);
+  padding:16px 28px; font-size:12px; color:var(--text3);
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
+}
+.site-footer a { color:var(--text2); text-decoration:none; }
+.site-footer a:hover { color:var(--accent2); }
+.site-footer .footer-links { display:flex; gap:16px; }
+
+/* Markdown */
+.md-preview { padding:16px; background:var(--bg3); border-radius:var(--radius2); border:1px solid var(--bg4); min-height:60px; line-height:1.6; }
+.md-preview h1,.md-preview h2,.md-preview h3 { margin:12px 0 6px; }
+.md-preview p { margin:4px 0; }
+.md-preview code { background:var(--bg4); padding:2px 6px; border-radius:3px; font-size:12px; }
+.md-preview pre { background:var(--bg4); padding:12px; border-radius:6px; overflow-x:auto; }
+.md-preview blockquote { border-left:3px solid var(--accent); margin:8px 0; padding:4px 12px; color:var(--text2); }
+.md-preview table { border-collapse:collapse; width:100%; margin:8px 0; }
+.md-preview th,.md-preview td { border:1px solid var(--bg4); padding:6px 10px; text-align:left; font-size:13px; }
+.md-preview img { max-width:100%; border-radius:var(--radius2); }
+
+/* Regex */
+.regex-flags { display:flex; gap:6px; align-items:center; }
+.regex-flags label { margin-bottom:0; font-weight:400; font-size:12px; }
+.regex-highlight { background:rgba(108,92,231,.3); border-radius:2px; }
+
+/* Unit converter */
+.unit-row { display:flex; gap:10px; align-items:flex-end; }
+.unit-row .form-group { flex:1; }
+.unit-swap { background:none; border:1px solid var(--bg4); color:var(--text2); border-radius:50%; width:36px; height:36px; cursor:pointer; font-size:18px; transition:all var(--transition); margin-bottom:14px; }
+.unit-swap:hover { border-color:var(--accent); color:var(--text); }
+
 .mobile-toggle { display:none; background:none; border:none; color:var(--text); cursor:pointer; padding:4px; }
 @media(max-width:768px) {
   body { flex-direction:column; }
@@ -342,6 +398,36 @@ select { cursor:pointer; appearance:none; background-image:url("data:image/svg+x
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="12" x2="9" y2="18"/><line x1="15" y1="12" x2="15" y2="18"/></svg>
       PDF Böl
     </button>
+
+    <div class="nav-category">Diğer Araçlar</div>
+    <button class="nav-item" data-tool="regex-tester">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      Regex Tester
+    </button>
+    <button class="nav-item" data-tool="markdown-preview">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+      Markdown Önizle
+    </button>
+    <button class="nav-item" data-tool="unit-converter">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><polyline points="15 18 6 18 6 9"/></svg>
+      Birim Dönüştürücü
+    </button>
+    <button class="nav-item" data-tool="timestamp">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Unix Zaman
+    </button>
+    <button class="nav-item" data-tool="img-compress">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+      Görsel Sıkıştır
+    </button>
+    <button class="nav-item" data-tool="img-convert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="12 3 12 21"/><polyline points="3 12 21 12"/></svg>
+      Format Dönüştür
+    </button>
+    <button class="nav-item" data-tool="color-picker">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+      Renk Seçici
+    </button>
   </nav>
   <div class="sidebar-footer">Tüm araçlar tarayıcıda çalışır • Veri sunucuya gitmez</div>
 </aside>
@@ -351,6 +437,11 @@ select { cursor:pointer; appearance:none; background-image:url("data:image/svg+x
   <div class="toolbar">
     <span class="toolbar-title" id="toolbarTitle">Tüm Araçlar</span>
     <div class="toolbar-actions">
+      <div class="search-wrap" style="margin-bottom:0;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="toolSearch" placeholder="Araç ara..." oninput="searchTools()" style="width:180px;padding:7px 10px 7px 30px;">
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Koyu</button>
       <button class="btn btn-ghost" onclick="switchTool('home')">Ana Sayfa</button>
     </div>
   </div>
@@ -417,6 +508,27 @@ select { cursor:pointer; appearance:none; background-image:url("data:image/svg+x
         </div>
         <div class="tool-card" onclick="switchTool('pdf-split')">
           <div class="tc-icon">✂️</div><h3>PDF Böl</h3><p>PDF'ten istediğin sayfaları ayır.</p>
+        </div>
+        <div class="tool-card" onclick="switchTool('regex-tester')">
+          <div class="tc-icon">🔍</div><h3>Regex Tester</h3><p>Düzenli ifadeleri test et, eşleşmeleri gör.</p>
+        </div>
+        <div class="tool-card" onclick="switchTool('markdown-preview')">
+          <div class="tc-icon">📝</div><h3>Markdown Önizle</h3><p>Markdown yaz, canlı önizlemesini gör.</p>
+        </div>
+        <div class="tool-card" onclick="switchTool('unit-converter')">
+          <div class="tc-icon">📏</div><h3>Birim Dönüştürücü</h3><p>Uzunluk, ağırlık, sıcaklık, hız, veri.</p>
+        </div>
+        <div class="tool-card" onclick="switchTool('timestamp')">
+          <div class="tc-icon">🕐</div><h3>Unix Zaman</h3><p>Tarih ↔ Unix timestamp dönüşümü.</p>
+        </div>
+        <div class="tool-card" onclick="switchTool('img-compress')">
+          <div class="tc-icon">🗜️</div><h3>Görsel Sıkıştır</h3><p>Görselin boyutunu KB olarak küçült.</p>
+        </div>
+        <div class="tool-card" onclick="switchTool('img-convert')">
+          <div class="tc-icon">🔄</div><h3>Format Dönüştür</h3><p>PNG, JPG, WebP arasında dönüştür.</p>
+        </div>
+        <div class="tool-card" onclick="switchTool('color-picker')">
+          <div class="tc-icon">💉</div><h3>Renk Seçici</h3><p>Göz damlalığı ile ekrandan renk al.</p>
         </div>
       </div>
     </section>
@@ -739,7 +851,129 @@ select { cursor:pointer; appearance:none; background-image:url("data:image/svg+x
       </div>
     </section>
 
+    <!-- REGEX TESTER -->
+    <section class="tool-section" id="tool-regex-tester">
+      <div class="card">
+        <div class="card-header"><h2>Regex Tester</h2><p>Düzenli ifadeleri (regular expression) test et. Eşleşmeleri canlı gör.</p></div>
+        <div class="form-group"><label>Regex Deseni</label><input type="text" id="regex-pattern" placeholder="Örn: \\d{3}-\\d{4}" oninput="testRegex()"></div>
+        <div class="regex-flags" style="margin-bottom:12px;">
+          <label><input type="checkbox" onchange="testRegex()" data-flag="g" checked> global</label>
+          <label><input type="checkbox" onchange="testRegex()" data-flag="i"> case-insensitive</label>
+          <label><input type="checkbox" onchange="testRegex()" data-flag="m"> multiline</label>
+        </div>
+        <div class="form-group"><label>Test Metni</label><textarea id="regex-input" placeholder="Test edilecek metin..." oninput="testRegex()"></textarea></div>
+        <div class="result-box" id="regex-result"></div>
+        <div id="regex-count" style="font-size:12px;color:var(--text2);margin-top:6px;"></div>
+      </div>
+    </section>
+
+    <!-- MARKDOWN PREVIEW -->
+    <section class="tool-section" id="tool-markdown-preview">
+      <div class="card">
+        <div class="card-header"><h2>Markdown Önizleme</h2><p>Markdown yaz, sağ tarafta canlı olarak nasıl göründüğünü izle.</p></div>
+        <div class="form-row">
+          <div class="form-group"><label>Markdown</label><textarea id="md-input" placeholder="# Başlık&#10;&#10;**kalın** ve *italik*&#10;&#10;- liste 1&#10;- liste 2&#10;&#10;[link](https://ornek.com)" oninput="previewMD()" style="min-height:200px;"></textarea></div>
+          <div class="form-group"><label>Önizleme</label><div class="md-preview" id="md-preview"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- UNIT CONVERTER -->
+    <section class="tool-section" id="tool-unit-converter">
+      <div class="card">
+        <div class="card-header"><h2>Birim Dönüştürücü</h2><p>Uzunluk, ağırlık, sıcaklık, hız ve veri boyutu dönüşümleri.</p></div>
+        <div class="form-row">
+          <div class="form-group"><label>Kategori</label><select id="unit-cat" onchange="switchUnitCat()">
+            <option value="length">Uzunluk</option><option value="weight">Ağırlık</option><option value="temp">Sıcaklık</option><option value="speed">Hız</option><option value="data">Veri Boyutu</option>
+          </select></div>
+          <div class="form-group"><label>Birim</label><select id="unit-from" onchange="convertUnit()"></select></div>
+        </div>
+        <div class="unit-row">
+          <div class="form-group"><input type="number" id="unit-input" value="1" oninput="convertUnit()" placeholder="Değer"></div>
+          <button class="unit-swap" onclick="swapUnits()" title="Yer değiştir">⇄</button>
+          <div class="form-group"><select id="unit-to" onchange="convertUnit()"></select></div>
+        </div>
+        <div class="pw-display" style="margin-top:14px;font-size:18px;"><code id="unit-result">—</code><button class="btn btn-outline" onclick="copyUnitResult()">📋</button></div>
+      </div>
+    </section>
+
+    <!-- UNIX TIMESTAMP -->
+    <section class="tool-section" id="tool-timestamp">
+      <div class="card">
+        <div class="card-header"><h2>Unix Zaman Dönüştürücü</h2><p>Unix timestamp ile normal tarih arasında dönüşüm yap.</p></div>
+        <div class="form-row">
+          <div class="form-group"><label>Unix Timestamp</label><input type="number" id="ts-unix" placeholder="1690000000" oninput="tsToDate()"></div>
+          <div class="form-group"><label>Tarih (ör: 2024-01-01 12:00)</label><input type="text" id="ts-date" placeholder="2024-01-01 12:00" oninput="dateToTs()"></div>
+        </div>
+        <div class="form-group"><label>Şimdiki Zaman</label><div class="result-box" id="ts-now" style="font-family:monospace;"></div></div>
+        <button class="btn btn-outline" onclick="copyNowTS()">📋 Unix Zamanı Kopyala</button>
+      </div>
+    </section>
+
+    <!-- IMAGE COMPRESS -->
+    <section class="tool-section" id="tool-img-compress">
+      <div class="card">
+        <div class="card-header"><h2>Görsel Sıkıştırıcı</h2><p>Görsel yükle, kaliteyi ayarla, sıkıştırılmış halini indir.</p></div>
+        <div class="drop-zone" id="compress-drop" onclick="document.getElementById('compress-file').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <div>Tıkla veya sürükle-bırak</div>
+          <div style="font-size:11px;color:var(--text3);">PNG, JPG, WebP</div>
+        </div>
+        <input type="file" id="compress-file" accept="image/*" style="display:none" onchange="loadCompressImage(this.files[0])">
+        <div class="form-group" style="margin-top:14px;"><label>Kalite: <span id="compress-q-val">80</span>%</label>
+          <div class="range-wrap"><input type="range" min="10" max="100" value="80" id="compress-quality" oninput="document.getElementById('compress-q-val').textContent=this.value;previewCompress()"></div>
+        </div>
+        <div class="form-row">
+          <button class="btn btn-accent" onclick="doCompress()">🗜️ Sıkıştır ve İndir</button>
+          <div id="compress-info" style="font-size:12px;color:var(--text2);display:flex;align-items:center;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- IMAGE FORMAT CONVERTER -->
+    <section class="tool-section" id="tool-img-convert">
+      <div class="card">
+        <div class="card-header"><h2>Format Dönüştürücü</h2><p>Görseli PNG, JPG, WebP veya BMP formatına dönüştür.</p></div>
+        <div class="drop-zone" id="convert-drop" onclick="document.getElementById('convert-file').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <div>Tıkla veya sürükle-bırak</div>
+        </div>
+        <input type="file" id="convert-file" accept="image/*" style="display:none" onchange="loadConvertImage(this.files[0])">
+        <div class="form-row" style="margin-top:14px;">
+          <div class="form-group"><label>Hedef Format</label><select id="convert-format"><option value="image/png">PNG</option><option value="image/jpeg">JPG</option><option value="image/webp">WebP</option><option value="image/bmp">BMP</option></select></div>
+        </div>
+        <button class="btn btn-accent" onclick="doConvert()">🔄 Dönüştür ve İndir</button>
+        <div id="convert-info" style="font-size:12px;color:var(--text2);margin-top:8px;"></div>
+      </div>
+    </section>
+
+    <!-- COLOR PICKER -->
+    <section class="tool-section" id="tool-color-picker">
+      <div class="card">
+        <div class="card-header"><h2>Renk Seçici</h2><p>Göz damlalığı ile ekrandan renk seç veya manuel renk gir.</p></div>
+        <div class="form-row">
+          <div class="form-group"><label>Renk Seç</label><input type="color" id="picker-color" value="#6c5ce7" oninput="updateColorPicker()" style="width:100%;height:50px;padding:4px;cursor:pointer;"></div>
+          <div class="form-group"><label>veya HEX Yaz</label><input type="text" id="picker-hex" value="#6c5ce7" oninput="syncColorFromHex()" placeholder="#000000"></div>
+        </div>
+        <div class="color-preview" id="picker-preview" style="background:#6c5ce7;height:100px;"></div>
+        <div class="form-row" style="margin-top:10px;">
+          <div class="result-box" id="picker-rgb" style="font-family:monospace;text-align:center;">rgb(108, 92, 231)</div>
+          <div class="result-box" id="picker-hsl" style="font-family:monospace;text-align:center;">hsl(247°, 74%, 63%)</div>
+        </div>
+        <button class="btn btn-outline" onclick="copyPickerColors()">📋 Tümünü Kopyala</button>
+      </div>
+    </section>
+
   </div>
+
+  <footer class="site-footer">
+    <span>© 2026 Araç Kutusu — Tüm araçlar tarayıcıda çalışır • Veri sunucuya gitmez</span>
+    <div class="footer-links">
+      <a href="#" onclick="switchTool('home')">Ana Sayfa</a>
+      <a href="#">Gizlilik</a>
+      <a href="#">İletişim</a>
+    </div>
+  </footer>
 </main>
 
 <div class="toast" id="toast"></div>
@@ -1343,6 +1577,305 @@ document.addEventListener('DOMContentLoaded',()=>{
 document.querySelectorAll('.nav-item').forEach(item=>{
   item.addEventListener('click',function(){switchTool(this.dataset.tool);});
 });
+
+// ===== SEARCH =====
+function searchTools(){
+  const q = document.getElementById('toolSearch').value.toLowerCase();
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.toggle('hidden', q && !item.textContent.toLowerCase().includes(q));
+  });
+  document.querySelectorAll('.tool-card').forEach(card => {
+    card.classList.toggle('hidden', q && !card.textContent.toLowerCase().includes(q));
+  });
+}
+
+// ===== THEME TOGGLE =====
+function toggleTheme(){
+  document.body.classList.toggle('light');
+  const isLight = document.body.classList.contains('light');
+  document.getElementById('themeBtn').textContent = isLight ? '☀️ Açık' : '🌙 Koyu';
+  try { localStorage.setItem('arackutusu-theme', isLight ? 'light' : 'dark'); } catch(e) {}
+}
+(function(){
+  try {
+    if(localStorage.getItem('arackutusu-theme')==='light'){
+      document.body.classList.add('light');
+      document.getElementById('themeBtn').textContent = '☀️ Açık';
+    }
+  } catch(e) {}
+})();
+
+// ===== REGEX TESTER =====
+function testRegex(){
+  const pattern = document.getElementById('regex-pattern').value;
+  const input = document.getElementById('regex-input').value;
+  const result = document.getElementById('regex-result');
+  const count = document.getElementById('regex-count');
+  if(!pattern){ result.textContent=''; count.textContent=''; return; }
+  try{
+    let flags = '';
+    document.querySelectorAll('[data-flag]:checked').forEach(cb => flags += cb.dataset.flag);
+    const re = new RegExp(pattern, flags);
+    const matches = input.match(re);
+    if(matches){
+      let html = input;
+      if(flags.includes('g')){
+        const parts = input.split(re);
+        let out = '';
+        for(let i=0;i<parts.length;i++){
+          out += parts[i].replace(/</g,'&lt;').replace(/>/g,'&gt;');
+          if(matches[i]) out += '<span class="regex-highlight">'+matches[i]+'</span>';
+        }
+        html = out;
+      } else {
+        html = input.replace(re, m => '<span class="regex-highlight">'+m+'</span>');
+      }
+      result.innerHTML = html || 'Eşleşme yok';
+      count.textContent = flags.includes('g') ? matches.length + ' eşleşme bulundu' : '1 eşleşme bulundu';
+    } else {
+      result.textContent = 'Eşleşme yok';
+      count.textContent = '0 eşleşme';
+    }
+  }catch(e){
+    result.textContent = '❌ Regex hatası: '+e.message;
+    count.textContent = '';
+  }
+}
+
+// ===== MARKDOWN PREVIEW =====
+function previewMD(){
+  const input = document.getElementById('md-input').value;
+  const preview = document.getElementById('md-preview');
+  try {
+    preview.innerHTML = marked.parse(input||'*Önizleme burada...*');
+  } catch(e) {
+    preview.textContent = 'Hata: '+e.message;
+  }
+}
+
+// ===== UNIT CONVERTER =====
+const unitData = {
+  length: { name:'Uzunluk', units:{ m:1, km:0.001, cm:100, mm:1000, mi:0.000621371, yd:1.09361, ft:3.28084, in:39.3701 }},
+  weight: { name:'Ağırlık', units:{ kg:1, g:1000, mg:1e6, ton:0.001, lb:2.20462, oz:35.274 }},
+  temp: { name:'Sıcaklık', units:{ '°C':null, '°F':null, K:null }},
+  speed: { name:'Hız', units:{ 'km/h':1, 'm/s':0.277778, mph:0.621371, knot:0.539957 }},
+  data: { name:'Veri', units:{ B:1, KB:0.001, MB:1e-6, GB:1e-9, TB:1e-12, KiB:0.000976563, MiB:9.53674e-7 }}
+};
+function switchUnitCat(){
+  const cat = document.getElementById('unit-cat').value;
+  const units = unitData[cat].units;
+  const from = document.getElementById('unit-from');
+  const to = document.getElementById('unit-to');
+  from.innerHTML = to.innerHTML = Object.keys(units).map(u => '<option value="'+u+'">'+u+'</option>').join('');
+  if(cat==='temp'){ from.value='°C'; to.value='°F'; }
+  convertUnit();
+}
+function convertUnit(){
+  const cat = document.getElementById('unit-cat').value;
+  const val = +document.getElementById('unit-input').value || 0;
+  const from = document.getElementById('unit-from').value;
+  const to = document.getElementById('unit-to').value;
+  let result;
+  if(cat==='temp'){
+    let celsius;
+    if(from==='°C') celsius = val;
+    else if(from==='°F') celsius = (val-32)*5/9;
+    else celsius = val-273.15;
+    if(to==='°C') result = celsius;
+    else if(to==='°F') result = celsius*9/5+32;
+    else result = celsius+273.15;
+  } else {
+    const baseVal = val / unitData[cat].units[from];
+    result = baseVal * unitData[cat].units[to];
+  }
+  document.getElementById('unit-result').textContent = parseFloat(result.toPrecision(8))+' '+to;
+}
+function swapUnits(){
+  const from = document.getElementById('unit-from');
+  const to = document.getElementById('unit-to');
+  [from.value, to.value] = [to.value, from.value];
+  convertUnit();
+}
+function copyUnitResult(){
+  navigator.clipboard.writeText(document.getElementById('unit-result').textContent);
+  showToast('✅ Kopyalandı!');
+}
+switchUnitCat();
+
+// ===== TIMESTAMP =====
+function tsToDate(){
+  const ts = +document.getElementById('ts-unix').value;
+  if(!ts) return;
+  const d = new Date(ts*1000);
+  document.getElementById('ts-date').value = d.toLocaleString('tr-TR');
+  document.getElementById('ts-now').textContent = 'Unix: '+Math.floor(Date.now()/1000)+' → '+new Date().toLocaleString('tr-TR');
+}
+function dateToTs(){
+  const str = document.getElementById('ts-date').value;
+  if(!str) return;
+  const d = new Date(str);
+  if(isNaN(d.getTime())) return;
+  document.getElementById('ts-unix').value = Math.floor(d.getTime()/1000);
+  document.getElementById('ts-now').textContent = 'Unix: '+Math.floor(Date.now()/1000)+' → '+new Date().toLocaleString('tr-TR');
+}
+function copyNowTS(){
+  navigator.clipboard.writeText(String(Math.floor(Date.now()/1000)));
+  showToast('✅ Unix zaman kopyalandı!');
+}
+(function updateTSNow(){
+  const el = document.getElementById('ts-now');
+  if(el) el.textContent = 'Unix: '+Math.floor(Date.now()/1000)+' → '+new Date().toLocaleString('tr-TR');
+})();
+
+// ===== IMAGE COMPRESS =====
+let compressOriginalFile = null;
+function loadCompressImage(file){
+  if(!file) return;
+  compressOriginalFile = file;
+  const info = document.getElementById('compress-info');
+  info.textContent = 'Orijinal: '+(file.size/1024).toFixed(1)+' KB';
+  document.getElementById('compress-drop').style.display = 'none';
+  previewCompress();
+}
+function previewCompress(){
+  if(!compressOriginalFile) return;
+  const q = +document.getElementById('compress-quality').value;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width; canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img,0,0);
+      canvas.toBlob(function(blob){
+        document.getElementById('compress-info').textContent =
+          'Orijinal: '+(compressOriginalFile.size/1024).toFixed(1)+' KB → Sıkışmış: ~'+(blob.size/1024).toFixed(1)+' KB (%'+(100-Math.round(blob.size/compressOriginalFile.size*100))+' küçüldü)';
+      }, compressOriginalFile.type, q/100);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(compressOriginalFile);
+}
+function doCompress(){
+  if(!compressOriginalFile){ showToast('⚠️ Önce görsel yükle'); return; }
+  const q = +document.getElementById('compress-quality').value;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width; canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img,0,0);
+      canvas.toBlob(function(blob){
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const ext = compressOriginalFile.type==='image/png'?'png':compressOriginalFile.type==='image/webp'?'webp':'jpg';
+        a.download = 'compressed.'+ext;
+        a.click(); URL.revokeObjectURL(url);
+        showToast('⬇ Sıkıştırıldı! '+(blob.size/1024).toFixed(1)+' KB');
+      }, compressOriginalFile.type, q/100);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(compressOriginalFile);
+}
+// drag&drop
+(function(){
+  const drop = document.getElementById('compress-drop');
+  if(!drop) return;
+  drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag-over');});
+  drop.addEventListener('dragleave',()=>drop.classList.remove('drag-over'));
+  drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('drag-over');
+    const f=e.dataTransfer.files[0]; if(f&&f.type.startsWith('image/')) loadCompressImage(f);
+  });
+})();
+
+// ===== IMAGE FORMAT CONVERTER =====
+let convertOriginalFile = null;
+function loadConvertImage(file){
+  if(!file) return;
+  convertOriginalFile = file;
+  document.getElementById('convert-info').textContent = 'Yüklendi: '+file.name+' ('+(file.size/1024).toFixed(1)+' KB)';
+  document.getElementById('convert-drop').style.display = 'none';
+}
+function doConvert(){
+  if(!convertOriginalFile){ showToast('⚠️ Önce görsel yükle'); return; }
+  const format = document.getElementById('convert-format').value;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width; canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img,0,0);
+      canvas.toBlob(function(blob){
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const ext = format.split('/')[1];
+        a.download = 'converted.'+ext;
+        a.click(); URL.revokeObjectURL(url);
+        showToast('⬇ '+ext.toUpperCase()+' olarak indirildi!');
+      }, format);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(convertOriginalFile);
+}
+// drag&drop
+(function(){
+  const drop = document.getElementById('convert-drop');
+  if(!drop) return;
+  drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag-over');});
+  drop.addEventListener('dragleave',()=>drop.classList.remove('drag-over'));
+  drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('drag-over');
+    const f=e.dataTransfer.files[0]; if(f&&f.type.startsWith('image/')) loadConvertImage(f);
+  });
+})();
+
+// ===== COLOR PICKER =====
+function updateColorPicker(){
+  const hex = document.getElementById('picker-color').value;
+  document.getElementById('picker-hex').value = hex;
+  document.getElementById('picker-preview').style.background = hex;
+  const rgb = hexToRgb(hex);
+  const hsl = rgbToHslArr(rgb[0],rgb[1],rgb[2]);
+  document.getElementById('picker-rgb').textContent = 'rgb('+rgb.join(', ')+')';
+  document.getElementById('picker-hsl').textContent = 'hsl('+hsl[0]+'°, '+hsl[1]+'%, '+hsl[2]+'%)';
+}
+function syncColorFromHex(){
+  const hex = document.getElementById('picker-hex').value;
+  if(!/^#[0-9a-fA-F]{6}$/.test(hex)) return;
+  document.getElementById('picker-color').value = hex;
+  updateColorPicker();
+}
+function hexToRgb(hex){
+  const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+  if(!m) return [0,0,0];
+  return [parseInt(m[1],16),parseInt(m[2],16),parseInt(m[3],16)];
+}
+function rgbToHslArr(r,g,b){
+  r/=255;g/=255;b/=255;
+  const max=Math.max(r,g,b),min=Math.min(r,g,b);
+  let h=0,s=0; const l=(max+min)/2;
+  if(max!==min){
+    const d=max-min; s=l>.5?d/(2-max-min):d/(max+min);
+    switch(max){case r:h=((g-b)/d+(g<b?6:0));break;case g:h=((b-r)/d+2);break;case b:h=((r-g)/d+4);break;}
+    h=Math.round(h*60);
+  }
+  return [h,Math.round(s*100),Math.round(l*100)];
+}
+function copyPickerColors(){
+  const hex = document.getElementById('picker-hex').value;
+  const rgb = document.getElementById('picker-rgb').textContent;
+  const hsl = document.getElementById('picker-hsl').textContent;
+  navigator.clipboard.writeText(hex+' | '+rgb+' | '+hsl);
+  showToast('✅ '+hex+' kopyalandı!');
+}
 </script>
 </body>
 </html>
